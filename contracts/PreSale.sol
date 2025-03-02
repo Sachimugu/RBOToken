@@ -57,3 +57,115 @@ pragma solidity ^0.8.0;
 //     - The owner can withdraw any unsold tokens.
 //     - The owner can withdraw any ETH raised during the presale.
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+contract FmcTokenPresale is Ownable {
+
+    IERC20 public token;  // The token being sold
+    uint256 public rate;  // Number of tokens per Ether (ETH)
+    uint256 public presaleStart;  // Presale start timestamp
+    uint256 public presaleEnd;    // Presale end timestamp
+    bool public isPresaleActive; 
+
+
+
+    uint256 public totalTokensSold;  // Total tokens sold during the presale
+    uint256 public totalETHRaised;  // Total ETH raised during the presale
+    uint256 public totalBuyers;     // Total number of unique buyers
+
+    mapping(address => bool) public hasPurchased; 
+
+
+
+    constructor(IERC20 _token, uint256 _rate, uint256 _start, uint256 _end) Ownable(msg.sender){
+        token = _token;
+        rate = _rate;
+        presaleStart = _start;
+        presaleEnd = _end;
+        isPresaleActive = true;
+    }
+
+     modifier whenPresaleActive() {
+        require(isPresaleActive, "Presale is not active");
+        require(block.timestamp >= presaleStart, "Presale has not started yet");
+        require(block.timestamp <= presaleEnd, "Presale has ended");
+        _;
+    }
+
+
+    // Function to buy tokens during the presale
+    event TokensPurchased(address indexed buyer, uint256 amount, uint256 cost);
+    function buyTokens() external payable whenPresaleActive {
+        require(msg.value > 0, "You must send ETH to purchase tokens");
+
+        uint256 tokenAmount = msg.value * rate;
+        uint256 cost = msg.value;  // Cost in ETH
+
+        // Ensure that the contract has enough tokens for the sale
+        uint256 contractBalance = token.balanceOf(address(this));
+        require(contractBalance >= tokenAmount, "Insufficient tokens in the presale contract");
+
+        // Transfer tokens to the buyer
+        token.transfer(msg.sender, tokenAmount);
+
+        // Emit event
+        emit TokensPurchased(msg.sender, tokenAmount, cost);
+    }
+
+
+    // Owner can withdraw Ether from the presale contract
+    function withdrawETH() external onlyOwner {
+        uint256 balance = address(this).balance;
+        require(balance > 0, "No Ether to withdraw");
+        payable(owner()).transfer(balance);
+    }
+
+
+    // Owner can withdraw unsold tokens from the presale contract after the presale ends
+    function withdrawRemainingTokens() external onlyOwner {
+        require(block.timestamp > presaleEnd, "Presale has not ended yet");
+        uint256 remainingTokens = token.balanceOf(address(this));
+        require(remainingTokens > 0, "No tokens to withdraw");
+        token.transfer(owner(), remainingTokens);
+    }
+
+       function stopPresale() external onlyOwner {
+        isPresaleActive = false;
+    }
+
+    // Function to update the presale rate (tokens per ETH)
+    function setRate(uint256 newRate) external onlyOwner {
+        rate = newRate;
+    }
+//Function to update presale start and end time
+    function updatePresalePeriod(uint256 newStart, uint256 newEnd) external onlyOwner {
+        presaleStart = newStart;
+        presaleEnd = newEnd;
+    }
+
+  // Function to check if presale is still active (helper function)
+    function checkPresaleStatus() external view returns (bool) {
+        return isPresaleActive && block.timestamp >= presaleStart && block.timestamp <= presaleEnd;
+    }
+
+
+     // Analytics function to get total tokens sold
+    function getTotalTokensSold() external view returns (uint256) {
+        return totalTokensSold;
+    }
+
+    // Analytics function to get total ETH raised
+    function getTotalETHRaised() external view returns (uint256) {
+        return totalETHRaised;
+    }
+
+    // Analytics function to get the total number of unique buyers
+    function getTotalBuyers() external view returns (uint256) {
+        return totalBuyers;
+    }
+
+    // Analytics function to get remaining tokens in the presale contract
+    function getRemainingTokens() external view returns (uint256) {
+        return token.balanceOf(address(this));
+    }
+}
