@@ -1,92 +1,3 @@
-// CONTRACT: StakingContract
-
-// VARIABLES:
-// - token: IERC20 (The token to stake)
-// - owner: address (The contract owner)
-// - stakers: mapping(address => uint256) (Mapping to track staked amounts per user)
-// - stakeTimes: mapping(address => uint256) (Mapping to track when users staked their tokens)
-// - totalStaked: uint256 (Total amount of tokens staked in the contract)
-// - rewardRate: uint256 (The annual reward rate, e.g., 10% = 1000 basis points)
-// - rewards: mapping(address => uint256) (Mapping to track rewards per user)
-// - event: Staked(address indexed user, uint256 amount) (Event for staking)
-// - event: Unstaked(address indexed user, uint256 amount) (Event for unstaking)
-// - event: RewardPaid(address indexed user, uint256 reward) (Event for reward distribution)
-
-// FUNCTIONS:
-
-// 1. CONSTRUCTOR(tokenAddress: address, rewardRate: uint256):
-//    - Set the token address
-//    - Set the initial reward rate (in basis points, e.g., 1000 = 10%)
-
-// 2. FUNCTION stake(uint256 amount):
-//    - Ensure the user is sending the correct amount of tokens
-//    - Transfer tokens from the user to the contract
-//    - Update the stakers' record with the new staked amount
-//    - Update the stake time to track how long they’ve staked
-//    - Increment the total staked amount
-//    - Emit a Staked event
-
-// 3. FUNCTION unstake(uint256 amount):
-//    - Ensure the user has enough staked tokens to withdraw
-//    - Transfer the requested amount of tokens back to the user
-//    - Update the stakers' record to reflect the unstaked amount
-//    - Update the total staked amount
-//    - Emit an Unstaked event
-
-// 4. FUNCTION calculateReward(address staker) internal view returns (uint256):
-//    - Calculate the reward based on the time the user has staked and the amount staked
-//    - Use the reward rate and the staked duration to calculate rewards (e.g., linear reward calculation)
-//    - Return the reward amount
-
-// 5. FUNCTION claimReward():
-//    - Calculate the rewards for the user
-//    - Ensure the user has rewards to claim
-//    - Transfer the rewards to the user
-//    - Emit a RewardPaid event
-
-// 6. FUNCTION setRewardRate(uint256 newRewardRate):
-//    - Allow the owner to adjust the reward rate (e.g., increase or decrease rewards)
-//    - Only owner can update the reward rate
-
-// 7. FUNCTION emergencyWithdraw(uint256 amount):
-//    - Allow the owner to withdraw any amount of tokens from the contract in emergency situations
-//    - Only owner can call this function
-
-// 8. EVENT: Staked(address indexed user, uint256 amount):
-//    - Triggered when a user stakes tokens
-
-// 9. EVENT: Unstaked(address indexed user, uint256 amount):
-//    - Triggered when a user unstakes tokens
-
-// 10. EVENT: RewardPaid(address indexed user, uint256 reward):
-//     - Triggered when a user claims rewards
-
-// ---
-
-// ### High-Level Staking Workflow:
-
-// 1. **User Stakes Tokens**:
-//    - The user deposits tokens into the contract using the `stake` function. Their staked amount and staking time are recorded.
-   
-// 2. **Reward Calculation**:
-//    - The contract calculates rewards based on the amount of tokens staked and the duration of the staking period.
-   
-// 3. **User Claims Rewards**:
-//    - The user can call the `claimReward` function to withdraw their accumulated rewards.
-   
-// 4. **User Unstakes Tokens**:
-//    - After staking, the user can call the `unstake` function to withdraw their tokens, minus any applicable rewards.
-
-// 5. **Owner Control**:
-//    - The owner can set a new reward rate or perform emergency withdrawals of tokens.
-
-// ---
-
-// ### Staking Smart Contract Example in Solidity:
-
-// Here’s the actual **Solidity code** for the staking smart contract:
-
-// ```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -101,43 +12,122 @@ contract StakingContract is Ownable {
     mapping(address => uint256) public stakedAmount; // Tracks staked tokens for each user
     mapping(address => uint256) public stakeTime; // Tracks the staking time for each user
     mapping(address => uint256) public rewards; // Tracks rewards for each user
+    mapping(address => StakingPeriod) public stakingPeriods; // Tracks the selected staking period for each user
 
-    event Staked(address indexed user, uint256 amount);
+    uint256 constant SECONDS_IN_A_YEAR = 365 days;
+    uint256 constant SECONDS_IN_A_MONTH = 30 days;
+    uint256 constant SECONDS_IN_6_MONTHS = 180 days;
+
+    // Enum to represent the staking period
+    enum StakingPeriod { OneMonth, SixMonths, OneYear }
+
+    event Staked(address indexed user, uint256 amount, StakingPeriod period);
     event Unstaked(address indexed user, uint256 amount);
     event RewardPaid(address indexed user, uint256 reward);
+    event EarlyUnstaked(address indexed user, uint256 amount, uint256 penaltyReward);
+    event AutoUnstaked(address indexed user, uint256 amount, uint256 reward);
 
-    constructor(IERC20 _token, uint256 _rewardRate) Ownable(msg.sender){
+    constructor(IERC20 _token) Ownable(msg.sender) {
         token = _token;
-        rewardRate = _rewardRate;
+        rewardRate = 15000; // 150% annual reward rate (15000 basis points)
     }
 
-    // Function to stake tokens
-    function stake(uint256 amount) external {
+    // Function to stake tokens with a selected stake period
+    function stake(uint256 amount, StakingPeriod period) external {
         require(amount > 0, "Amount must be greater than 0");
+        
+        // Validate the selected staking period
+        require(period == StakingPeriod.OneMonth || period == StakingPeriod.SixMonths || period == StakingPeriod.OneYear, "Invalid staking period");
+        
         token.transferFrom(msg.sender, address(this), amount); // Transfer tokens from user to contract
         stakedAmount[msg.sender] += amount;
         stakeTime[msg.sender] = block.timestamp; // Record the time of staking
+        stakingPeriods[msg.sender] = period; // Record the staking period
         totalStaked += amount;
-        emit Staked(msg.sender, amount);
+        
+        emit Staked(msg.sender, amount, period);
     }
 
-    // Function to unstake tokens
-    function unstake(uint256 amount) external {
-        require(stakedAmount[msg.sender] >= amount, "Not enough staked tokens");
-        stakedAmount[msg.sender] -= amount;
-        totalStaked -= amount;
-        token.transfer(msg.sender, amount); // Transfer the unstaked tokens to user
-        emit Unstaked(msg.sender, amount);
+    // Function to automatically unstake when the staking period has elapsed
+    function autoUnstake() external {
+        require(stakedAmount[msg.sender] > 0, "No tokens to unstake");
+
+        StakingPeriod selectedPeriod = stakingPeriods[msg.sender];
+        uint256 stakingDuration = block.timestamp - stakeTime[msg.sender];
+
+        // Check if the staking period has passed
+        if (stakingDuration >= getPeriodInSeconds(selectedPeriod)) {
+            uint256 rewardAmount = calculateReward(msg.sender);
+
+            // Transfer staked tokens and rewards to the user
+            uint256 unstakedAmount = stakedAmount[msg.sender];
+            stakedAmount[msg.sender] = 0; // Reset the staked amount
+            rewards[msg.sender] = 0; // Reset the rewards
+            stakeTime[msg.sender] = block.timestamp; // Reset the staking time
+            stakingPeriods[msg.sender] = StakingPeriod.OneMonth; // Reset stake period to default (OneMonth)
+            totalStaked -= unstakedAmount;
+
+            // Transfer the staked tokens and rewards to the user
+            token.transfer(msg.sender, unstakedAmount + rewardAmount); // Transfer tokens and reward
+
+            emit AutoUnstaked(msg.sender, unstakedAmount, rewardAmount); // Emit event for auto unstake
+        }
+    }
+
+    // Function to manually unstake tokens before the staking period has ended
+    function earlyUnstake() external {
+        require(stakedAmount[msg.sender] > 0, "No tokens to unstake");
+        
+        uint256 stakingDuration = block.timestamp - stakeTime[msg.sender];
+        uint256 penalty = 0; // Initialize penalty variable
+        uint256 rewardAmount = calculateReward(msg.sender); // Calculate rewards for the user
+
+        StakingPeriod selectedPeriod = stakingPeriods[msg.sender];
+
+        // If the staking period hasn't elapsed (e.g., 1 year, 6 months, or 1 month), apply a penalty to rewards
+        if (stakingDuration < getPeriodInSeconds(selectedPeriod)) {
+            // Apply a penalty: if unstaking early, lose part of the reward
+            penalty = rewardAmount / 2; // For example, 50% penalty for early unstaking
+            rewardAmount -= penalty;  // Apply the penalty
+        }
+
+        // Reset user's staking data
+        uint256 unstakedAmount = stakedAmount[msg.sender];
+        stakedAmount[msg.sender] = 0;
+        rewards[msg.sender] = 0; // Reset rewards
+        stakeTime[msg.sender] = block.timestamp; // Reset staking time
+        stakingPeriods[msg.sender] = StakingPeriod.OneMonth; // Reset stake period to default (OneMonth)
+        totalStaked -= unstakedAmount;
+
+        // Transfer the staked tokens and rewards (minus penalty) to the user
+        token.transfer(msg.sender, unstakedAmount + rewardAmount); // Transfer staked tokens and remaining reward
+
+        // Emit events
+        emit Unstaked(msg.sender, unstakedAmount);
+        emit RewardPaid(msg.sender, rewardAmount);
+        emit EarlyUnstaked(msg.sender, unstakedAmount, penalty); // Event for early unstaking with penalty
     }
 
     // Function to calculate rewards for a staker
     function calculateReward(address staker) internal view returns (uint256) {
-        uint256 stakedDuration = block.timestamp - stakeTime[staker]; // Duration staked in seconds
-        uint256 reward = (stakedAmount[staker] * rewardRate * stakedDuration) / (365 days * 100); // Linear reward calculation
+        uint256 stakingDuration = block.timestamp - stakeTime[staker]; // Duration staked in seconds
+        uint256 selectedPeriod = getPeriodInSeconds(stakingPeriods[staker]); // Get the selected staking period in seconds
+        uint256 reward = (stakedAmount[staker] * rewardRate * stakingDuration) / (selectedPeriod * 100); // Linear reward calculation
         return reward;
     }
 
-    // Function to claim rewards
+    // Function to convert the staking period enum into its corresponding number of seconds
+    function getPeriodInSeconds(StakingPeriod period) internal pure returns (uint256) {
+        if (period == StakingPeriod.OneMonth) {
+            return SECONDS_IN_A_MONTH;
+        } else if (period == StakingPeriod.SixMonths) {
+            return SECONDS_IN_6_MONTHS;
+        } else {
+            return SECONDS_IN_A_YEAR;
+        }
+    }
+
+    // Function to claim rewards manually
     function claimReward() external {
         uint256 reward = calculateReward(msg.sender);
         require(reward > 0, "No rewards available");
@@ -147,13 +137,19 @@ contract StakingContract is Ownable {
         emit RewardPaid(msg.sender, reward);
     }
 
+    // Emergency withdraw function for the owner
+    function emergencyWithdraw(uint256 amount) external onlyOwner {
+        token.transfer(msg.sender, amount);
+    }
+
     // Function for the owner to adjust the reward rate
     function setRewardRate(uint256 newRewardRate) external onlyOwner {
         rewardRate = newRewardRate;
     }
 
-    // Emergency withdraw function for the owner
-    function emergencyWithdraw(uint256 amount) external onlyOwner {
-        token.transfer(msg.sender, amount);
-    }
+    // Function to return the current reward of a specific user (accepts address as a parameter)
+function getCurrentReward(address user) external view returns (uint256) {
+    return calculateReward(user); // Return the calculated reward for the given address
+}
+
 }
