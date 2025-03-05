@@ -154,3 +154,16 @@
   animation: border-glow 2s infinite ease-in-out;
   pointer-events: none; /* Ensure the border doesn't interfere with clicks */
 }
+.glowing-text {
+  font-size: 3rem;
+  color: white;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 5px pink, 0 0 10px pink, 0 0 15px purple, 0 0 20px purple;
+}
+
+.glowing-text:hover {
+  color: pink;
+  text-shadow: 0 0 10px pink, 0 0 20px purple, 0 0 30px pink, 0 0 40px purple;
+  transform: scale(1.1);
+}

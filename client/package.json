@@ -10,19 +10,24 @@
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.3",
+    "animated-backgrounds": "^1.1.0",
     "chart.js": "^4.4.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.4.10",
     "lucide-react": "^0.477.0",
     "next": "15.2.0",
+    "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
+    "react-vertical-timeline-component": "^3.5.3",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "daisyui": "^5.0.0",
     "tailwindcss": "^4"
   }
 }

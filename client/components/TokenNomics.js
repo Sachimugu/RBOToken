@@ -1,9 +1,11 @@
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
+import { MemoryStick, MemoryStickIcon } from "lucide-react";
 import { Doughnut } from "react-chartjs-2";
 
 // Register Chart.js components
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
+// Tokenomics component
 const Tokenomics = () => {
   // Dummy data for token distribution
   const tokenDistribution = {
@@ -13,15 +15,44 @@ const Tokenomics = () => {
         label: "Token Distribution",
         data: [40, 20, 10, 15, 15], // Percentages
         backgroundColor: [
-          "#FBBF24", // Yellow for Presale
+          "#D8B4FE", // Yellow for Presale
           "#3B82F6", // Blue for Team
-          "#10B981", // Green for Advisors
-          "#EF4444", // Red for Marketing
+          "#FFB6C1", // Green for Advisors
+          "#6366F1", // Red for Marketing
           "#8B5CF6", // Purple for Liquidity
         ],
         borderWidth: 0,
       },
     ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem) {
+            let label = tooltipItem.label || '';
+            let value = tooltipItem.raw;
+            let total = tooltipItem.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+            let percentage = ((value / total) * 100).toFixed(2);
+            return `${label}: ${percentage}%`;
+          },
+        },
+      },
+      // Displaying percentage inside the donut
+      doughnutlabel: {
+        labels: [
+          {
+            text: 'Tokenomics',
+            font: {
+              size: 20,
+            },
+            color: '#333',
+          },
+        ],
+      },
+    },
   };
 
   return (
@@ -34,12 +65,12 @@ const Tokenomics = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           {/* Token Distribution Chart */}
           <div className="w-full max-w-md mx-auto">
-            <Doughnut data={tokenDistribution} />
+            <Doughnut data={tokenDistribution} options={options} />
           </div>
 
           {/* Token Details */}
           <div className="space-y-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="hover:bg-white p-6 rounded-lg shadow-lg bg-purple-50">
               <h3 className="text-2xl font-semibold text-indigo-900 mb-4">
                 Token Distribution
               </h3>
@@ -68,7 +99,7 @@ const Tokenomics = () => {
             </div>
 
             {/* Token Metrics */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="hover:bg-white p-6 rounded-lg shadow-lg bg-purple-50">
               <h3 className="text-2xl font-semibold text-indigo-900 mb-4">
                 Token Metrics
               </h3>

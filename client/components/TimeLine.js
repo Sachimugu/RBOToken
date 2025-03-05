@@ -6,34 +6,35 @@ const roadmapData = [
     milestone: "Presale Launch",
     description: "Start of the presale phase. Early backers can get exclusive tokens at a discounted rate.",
     date: "Q1 2025",
-    icon: <Calendar size={32} className="text-primary" />,
+    icon: <Calendar size={32} className="text-orange-700" />,
     image: "/images/presale.png",
   },
   {
     milestone: "Token Launch",
     description: "Official launch of MyToken. Tokens will be available for purchase on major exchanges.",
     date: "Q2 2025",
-    icon: <Rocket size={32} className="text-primary" />,
+    icon: <Rocket size={32} className="text-orange-700" />,
     image: "/images/token-launch.png",
   },
   {
     milestone: "Partnerships & Integrations",
     description: "Strategic partnerships with key platforms and integrations with Web3 services.",
     date: "Q3 2025",
-    icon: <Users size={32} className="text-primary" />,
+    icon: <Users size={32} className="text-orange-700" />,
     image: "/images/partnerships.png",
   },
   {
     milestone: "Community Governance",
     description: "Full launch of community-driven governance, where holders can vote on proposals.",
     date: "Q4 2025",
-    icon: <CheckCircle size={32} className="text-primary" />,
+    icon: <CheckCircle size={32} className="text-orange-700" />,
     image: "/images/governance.png",
   },
 ];
 
 export const RoadmapSection = () => {
   return (
+    <div className="bg-purple-100">
     <section id="roadmap" className="container py-24 sm:py-32 mx-auto px-4 md:px-8">
       <div className="text-center mb-16">
         <h2 className="text-lg text-gray-700 mb-2 font-semibold">Roadmap</h2>
@@ -54,31 +55,24 @@ export const RoadmapSection = () => {
             }`}
           >
             <div className={`w-full md:w-1/2 ${index % 2 === 0 ? "pr-8" : "pl-8"}`}>
-              <Card className="bg-white shadow-lg hover:shadow-2xl transition-all duration-300">
+              <Card className="bg-purple-200 shadow-lg hover:shadow-2xl transition-all duration-300">
                 <CardHeader className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center shadow-lg">
+                 
                     {item.icon}
-                  </div>
-                  <CardTitle className="text-2xl font-bold text-gray-900">{item.milestone}</CardTitle>
+                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-yellow-600 to-purple-600 bg-clip-text text-transparent">{item.milestone}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 mb-4">{item.description}</p>
+                  <p className="text-sm hidden md:inline text-gray-600 mb-4 text-center">{item.description}</p>
                   <p className="text-sm text-gray-500 font-semibold">{item.date}</p>
                 </CardContent>
               </Card>
-            </div>
-
-            <div className="w-full md:w-1/2">
-              <img
-                src={item.image}
-                alt={item.milestone}
-                className="rounded-lg shadow-md hover:scale-105 transition-transform duration-300"
-              />
             </div>
           </div>
         ))}
       </div>
     </section>
+
+    </div>
   );
 };
 

@@ -12,10 +12,19 @@ const Navbar = () => {
   };
 
   return (
-    <header className="py-4 shadow-lg bg-indigo-900 fixed w-full z-50">
+    <header className="py-3 shadow-lg bg-indigo-900 fixed w-full z-50">
       <nav className="max-w-6xl mx-auto px-4 flex justify-between items-center text-white">
         {/* Logo */}
-        <h1 className="text-4xl font-extrabold text-yellow-400">MyToken</h1>
+        <div className="flex justify-center items-center -gap-4">
+
+        <img
+            src="/images/004.png"
+            alt="Hero"
+            className="h-15 w-20 mx-auto"
+          />
+        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-yellow-600 to-purple-600 bg-clip-text text-transparent -ml-4">RBO</h1>
+        </div>
+        
 
         {/* Desktop Navigation */}
         <ul className="hidden md:flex space-x-8 text-lg">

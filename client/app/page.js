@@ -80,9 +80,9 @@ export default function Home() {
       <About/>
       <Tokenomics/>
       <RoadmapSection/>
-      <FAQSection/>
+      {/* <FAQSection/> */}
       {/* Presale Section */}
-      <section id="presale" className="py-16 bg-gray-900 text-center space-y-8">
+      {/* <section id="presale" className="py-16 bg-gray-900 text-center space-y-8">
         <h2 className="text-4xl font-bold text-yellow-400">Token Presale</h2>
         <p className="text-lg text-gray-400">Get in early! Secure your tokens now.</p>
 
@@ -97,10 +97,10 @@ export default function Home() {
         <button className="bg-indigo-600 text-white py-3 px-8 rounded-xl shadow-lg mt-6 hover:bg-indigo-700 transition-all">
           Buy Tokens Now
         </button>
-      </section>
+      </section> */}
 
       {/* Airdrop Section */}
-      <section id="airdrop" className="py-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-center space-y-8">
+      {/* <section id="airdrop" className="py-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-center space-y-8">
         <h2 className="text-4xl font-bold">Airdrop</h2>
         <p className="text-lg text-gray-200">Join our airdrop and earn free tokens just by participating!</p>
 
@@ -116,10 +116,10 @@ export default function Home() {
         <button className="bg-yellow-500 text-black py-3 px-8 rounded-xl shadow-lg mt-6 hover:bg-yellow-400 transition-all">
           Participate Now
         </button>
-      </section>
+      </section> */}
 
       {/* Stake & Earn Section */}
-      <section id="stake" className="py-16 bg-gray-900 text-white text-center space-y-8">
+      {/* <section id="stake" className="py-16 bg-gray-900 text-white text-center space-y-8">
         <h2 className="text-4xl font-bold">Stake & Earn</h2>
         <p className="text-lg text-gray-400">Earn passive rewards by staking MyToken. The more you stake, the more you earn.</p>
 
@@ -131,10 +131,10 @@ export default function Home() {
         <button className="bg-indigo-600 text-white py-3 px-8 rounded-xl shadow-lg mt-6 hover:bg-indigo-700 transition-all">
           Stake Now
         </button>
-      </section>
+      </section> */}
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8">
+      {/* <footer className="bg-gray-800 text-white py-8">
         <div className="max-w-6xl mx-auto flex justify-between">
           <p>&copy; 2025 MyToken. All Rights Reserved.</p>
           <ul className="flex space-x-8">
@@ -143,7 +143,7 @@ export default function Home() {
             <li><a href="#" className="hover:text-gray-300">Contact</a></li>
           </ul>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }
