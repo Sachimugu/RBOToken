@@ -29,10 +29,11 @@ const faqData = [
 
 export const FAQSection = () => {
   return (
-    <section id="faq" className="container py-24 sm:py-32 mx-auto px-4 md:px-8">
+    <section id="faq" className=" py-24 sm:py-32 mx-auto px-4 md:px-8 bg-purple-100 relative bg-no-repeat bg-cover z-0 bg-center" style={{ backgroundImage: 'url(/images/bg.jpg)' }}>
+    <div className="bg-purple-100 relative bg-no-repeat bg-cover z-0 bg-center" style={{ backgroundImage: 'url(/images/bg.jpg)' }}>
+
       <div className="text-center mb-16">
-        <h2 className="text-lg text-primary mb-2 font-semibold">FAQs</h2>
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-600 to-purple-600 bg-clip-text text-transparent">
           Frequently Asked Questions
         </h2>
         <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -53,6 +54,7 @@ export const FAQSection = () => {
           </AccordionItem>
         ))}
       </Accordion>
+      </div>
     </section>
   );
 };

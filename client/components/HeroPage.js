@@ -1,7 +1,13 @@
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import GlowingH1 from "./Glowtext";
 
 const HeroPage = () => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push("/presale");
+  };
   return (
     <div>
       <section className="flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 py-24 min-h-screen relative overflow-hidden">
@@ -42,7 +48,7 @@ const HeroPage = () => {
 
             {/* Call-to-Action Button */}
             <div className="space-x-4 ">
-              <button className="bg-yellow-400 text-black py-3 px-8 rounded-xl text-lg font-medium shadow-md hover:bg-yellow-500 transition-colors mt-8">
+              <button onClick={handleClick} className="bg-yellow-400 text-black py-3 px-8 rounded-xl text-lg font-medium shadow-md hover:bg-yellow-500 transition-colors mt-8">
                 Join Presale
               </button>
               <button className="hidden md:inline border-[2px] border-yellow-400 text-white font-bold py-2 px-8 rounded-xl text-lg shadow-md hover:bg-yellow-500 transition-colors mt-8">

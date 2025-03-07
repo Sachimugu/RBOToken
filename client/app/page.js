@@ -74,13 +74,12 @@ export default function Home() {
   return (
     <div className="bg-gradient-to-r from-indigo-900 to-purple-800 min-h-screen text-white">
       {/* Header */}
-      <Navbar/>
 
       <HeroPage/>
       <About/>
       <Tokenomics/>
       <RoadmapSection/>
-      {/* <FAQSection/> */}
+      <FAQSection/>
       {/* Presale Section */}
       {/* <section id="presale" className="py-16 bg-gray-900 text-center space-y-8">
         <h2 className="text-4xl font-bold text-yellow-400">Token Presale</h2>
@@ -134,16 +133,7 @@ export default function Home() {
       </section> */}
 
       {/* Footer */}
-      {/* <footer className="bg-gray-800 text-white py-8">
-        <div className="max-w-6xl mx-auto flex justify-between">
-          <p>&copy; 2025 MyToken. All Rights Reserved.</p>
-          <ul className="flex space-x-8">
-            <li><a href="#" className="hover:text-gray-300">Privacy Policy</a></li>
-            <li><a href="#" className="hover:text-gray-300">Terms of Service</a></li>
-            <li><a href="#" className="hover:text-gray-300">Contact</a></li>
-          </ul>
-        </div>
-      </footer> */}
+      
     </div>
   );
 }

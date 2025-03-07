@@ -17,14 +17,14 @@ const roadmapData = [
     image: "/images/token-launch.png",
   },
   {
-    milestone: "Partnerships & Integrations",
+    milestone: "Partnerships",
     description: "Strategic partnerships with key platforms and integrations with Web3 services.",
     date: "Q3 2025",
     icon: <Users size={32} className="text-orange-700" />,
     image: "/images/partnerships.png",
   },
   {
-    milestone: "Community Governance",
+    milestone: "Community",
     description: "Full launch of community-driven governance, where holders can vote on proposals.",
     date: "Q4 2025",
     icon: <CheckCircle size={32} className="text-orange-700" />,
@@ -34,11 +34,12 @@ const roadmapData = [
 
 export const RoadmapSection = () => {
   return (
-    <div className="bg-purple-100">
-    <section id="roadmap" className="container py-24 sm:py-32 mx-auto px-4 md:px-8">
-      <div className="text-center mb-16">
-        <h2 className="text-lg text-gray-700 mb-2 font-semibold">Roadmap</h2>
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Our Journey Ahead</h2>
+    <div className="bg-purple-100 relative bg-no-repeat bg-cover z-0 bg-center" style={{ backgroundImage: 'url(/images/bg.jpg)' }}>
+        {/* <div className="absolute inset-0 bg-purple-100 opacity-60 z-0"></div> */}
+    <section id="roadmap" className="container py-24 sm:py-32 mx-auto px-4 md:px-8 z-10">
+      <div className="text-center mb-16 z-30">
+        <h2 className="text-lg text-black mb-2 font-semibold">Roadmap</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-purple-900">Our Journey Ahead</h2>
         <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
           Follow our journey as we revolutionize the crypto space. Our roadmap outlines key milestones and plans for the future.
         </p>

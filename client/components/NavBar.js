@@ -13,7 +13,7 @@ const Navbar = () => {
 
   return (
     <header className="py-3 shadow-lg bg-indigo-900 fixed w-full z-50">
-      <nav className="max-w-6xl mx-auto px-4 flex justify-between items-center text-white">
+      <nav className="max-w-[90rem] mx-auto px-4 flex justify-between items-center text-white">
         {/* Logo */}
         <div className="flex justify-center items-center -gap-4">
 
@@ -29,17 +29,17 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <ul className="hidden md:flex space-x-8 text-lg">
           <li>
-            <Link href="#presale" className="hover:text-gray-300 transition-colors">
+            <Link href="/presale" className="hover:text-pink-300 transition-colors">
               Presale
             </Link>
           </li>
           <li>
-            <Link href="#airdrop" className="hover:text-gray-300 transition-colors">
+            <Link href="/airdrop" className="hover:text-pink-300 transition-colors">
               Airdrop
             </Link>
           </li>
           <li>
-            <Link href="#stake" className="hover:text-gray-300 transition-colors">
+            <Link href="/stake" className="hover:text-pink-300 transition-colors">
               Stake & Earn
             </Link>
           </li>
