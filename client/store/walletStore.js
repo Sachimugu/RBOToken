@@ -3,7 +3,6 @@ import CONTRACT_ABI from '@/lib/abi';
 import { create } from 'zustand';
 import Web3Modal from 'web3modal';
 import { ethers } from 'ethers';
-import { handleError } from '@/lib/Errormsg';
 
 // Provider options for Web3Modal
 export const options = {

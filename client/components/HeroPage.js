@@ -1,13 +1,22 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import GlowingH1 from "./Glowtext";
+import { useWalletStore } from "@/store/walletStore";
 
 const HeroPage = () => {
   const router = useRouter();
+  const {connectWallet, walletAddress,storeError} = useWalletStore
+
 
   const handleClick = () => {
     router.push("/presale");
-  };
+  }
+
+  handleConnect = () => {
+    connectWallet()
+  }
+
+
   return (
     <div>
       <section className="flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 py-24 min-h-screen relative overflow-hidden">
@@ -52,7 +61,7 @@ const HeroPage = () => {
                 Join Presale
               </button>
               <button className="hidden md:inline border-[2px] border-yellow-400 text-white font-bold py-2 px-8 rounded-xl text-lg shadow-md hover:bg-yellow-500 transition-colors mt-8">
-                Connect Wallet
+                {walletAddress? walletAddress:"Connect Wallet"}
               </button>
             </div>
           </div>
