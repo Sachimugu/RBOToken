@@ -2,18 +2,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import GlowingH1 from "./Glowtext";
 import { useWalletStore } from "@/store/walletStore";
+import ERC20abi from "@/lib/abi/Ecr20ABI";
 
 const HeroPage = () => {
   const router = useRouter();
-  const {connectWallet, walletAddress,storeError} = useWalletStore
+  const {connectWallet, walletAddress,storeError} = useWalletStore()
 
 
   const handleClick = () => {
     router.push("/presale");
   }
 
-  handleConnect = () => {
-    connectWallet()
+  const handleConnect = () => {
+    connectWallet(ERC20abi)
   }
 
 
@@ -60,8 +61,9 @@ const HeroPage = () => {
               <button onClick={handleClick} className="bg-yellow-400 text-black py-3 px-8 rounded-xl text-lg font-medium shadow-md hover:bg-yellow-500 transition-colors mt-8">
                 Join Presale
               </button>
-              <button className="hidden md:inline border-[2px] border-yellow-400 text-white font-bold py-2 px-8 rounded-xl text-lg shadow-md hover:bg-yellow-500 transition-colors mt-8">
-                {walletAddress? walletAddress:"Connect Wallet"}
+              <button onClick={handleConnect} className="hidden md:inline border-[2px] border-yellow-400 text-white font-bold py-2 px-8 rounded-xl text-lg shadow-md hover:bg-yellow-500 transition-colors mt-8">
+                {walletAddress? `0x...${walletAddress.slice(35)}`:"Connect Wallet"}
+                
               </button>
             </div>
           </div>

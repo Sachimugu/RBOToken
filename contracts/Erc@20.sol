@@ -7,11 +7,11 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-contract FmcToken is ERC20Capped, Ownable {
+contract RBOToken is ERC20Capped, Ownable {
     uint256 public burnRate;  // Burn rate as a percentage (e.g., 1% = 100)
     uint256 private constant BURN_RATE_DIVISOR = 10000;
 
-    constructor() ERC20("FmcToken", "FMC") ERC20Capped(100000000 * (10 ** decimals())) Ownable(msg.sender){
+    constructor() ERC20("RBOToken", "RBO") ERC20Capped(100000000 * (10 ** decimals())) Ownable(msg.sender){
         burnRate = 1000;
         _mint(owner(), 70000000 * (10 ** decimals()));
     }

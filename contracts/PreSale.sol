@@ -86,9 +86,9 @@ contract FmcTokenPresale is Ownable {
     }
 
      modifier whenPresaleActive() {
-        require(isPresaleActive, "Presale is not active");
-        require(block.timestamp >= presaleStart, "Presale has not started yet");
-        require(block.timestamp <= presaleEnd, "Presale has ended");
+        // require(isPresaleActive, "Presale is not active");
+        // require(block.timestamp >= presaleStart, "Presale has not started yet");
+        // require(block.timestamp <= presaleEnd, "Presale has ended");
         _;
     }
 

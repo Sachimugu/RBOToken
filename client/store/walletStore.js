@@ -1,5 +1,5 @@
 'use client';
-import CONTRACT_ABI from '@/lib/abi';
+// import CONTRACT_ABI from '@/lib/abi';
 import { create } from 'zustand';
 import Web3Modal from 'web3modal';
 import { ethers } from 'ethers';
@@ -49,7 +49,7 @@ export const useWalletStore = create((set, get) => {
     contract: null,
     storeErr:null,
     walletAddress: walletAddress || null,
-    _CONTRACT_ABI: CONTRACT_ABI['abi'],
+    // _CONTRACT_ABI: CONTRACT_ABI['abi'],
     CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || contractAddress || "",
 
     setStoreErr: (newErr) => set({ storeErr: newErr }),
@@ -57,10 +57,10 @@ export const useWalletStore = create((set, get) => {
     setProvider: (newProvider) => set({ provider: newProvider }),
     setWalletAddress: (newAddress) => set({ walletAddress: newAddress }),
 
-    connectWallet: async () => {
+    connectWallet: async (CONTRACT_ABI) => {
     setStoreErr({storeErr:null});
 
-      console.log('abi...',CONTRACT_ABI['abi'] );
+      // console.log('abi...',CONTRACT_ABI['abi'] );
       const { walletAddress, contract } = get();
     
       // If wallet is already connected, no need to reconnect
@@ -92,7 +92,7 @@ export const useWalletStore = create((set, get) => {
         // Create contract instance with signer
         const newContract = new ethers.Contract(
           process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-          CONTRACT_ABI['abi'], // Ensure you have the correct ABI
+          CONTRACT_ABI, // Ensure you have the correct ABI
           signer
         );
     

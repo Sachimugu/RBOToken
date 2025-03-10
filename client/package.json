@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@metamask/providers": "^20.0.0",
     "@radix-ui/react-accordion": "^1.2.3",
+    "@walletconnect/client": "^1.8.0",
     "animated-backgrounds": "^1.1.0",
     "chart.js": "^4.4.8",
     "class-variance-authority": "^0.7.1",
