@@ -253,7 +253,7 @@ export const useWalletStore = create((set, get) => {
     
 
 
-    callReadOnlyFunction: async (CONTRACT_ABI, methodName, ...params) => {
+    callReadOnlyFunction: async (CONTRACT_ABI, NEXT_PUBLIC_CONTRACT_ADDRESS, methodName, ...params) => {
     set({storeErr:null});
 
       const { contract, provider, walletAddress } = get();
@@ -278,7 +278,7 @@ export const useWalletStore = create((set, get) => {
     
         // Create contract instance with signer
         const newContract = new ethers.Contract(
-          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+          NEXT_PUBLIC_CONTRACT_ADDRESS,
           CONTRACT_ABI, // Ensure you have the correct ABI
           signer
         );// Attempt to connect wallet and set contract
@@ -319,7 +319,7 @@ export const useWalletStore = create((set, get) => {
 
     // const { ethers } = require('ethers');
 
-callReadOnlyFunctionWithPrivateKey : async (CONTRACT_ABI, methodName, ...params) => {
+callReadOnlyFunctionWithPrivateKey : async (CONTRACT_ABI, NEXT_PUBLIC_CONTRACT_ADDRESS,  methodName, ...params) => {
     set({storeErr:null});
  
 
@@ -337,7 +337,7 @@ callReadOnlyFunctionWithPrivateKey : async (CONTRACT_ABI, methodName, ...params)
 
 
     const newContract = new ethers.Contract(
-      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+      NEXT_PUBLIC_CONTRACT_ADDRESS,
       CONTRACT_ABI,
       wallet
     )

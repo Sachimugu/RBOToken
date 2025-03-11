@@ -1,11 +1,29 @@
+'use client'
 import TabContainer from "@/components/forms/Tabform";
 import LoginForm from "@/components/forms/Textbox";
 import PresaleStepsTimeline from "@/components/PresaleTimeline";
+import ERC20abi from "@/lib/abi/Ecr20ABI";
+import { useWalletStore } from "@/store/walletStore";
+import { ethers } from "ethers";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 // import { useRouter } from "next/navigation";
 // import GlowingH1 from "./Glowtext";
 
 const PreSale = () => {
+  const {callReadOnlyFunction} = useWalletStore()
+  const [presaleBalance, setpresaleBalance] = useState(0)
+
+  useEffect(() => {
+
+const fetchBalance= async  ()=>{
+  const balance = await callReadOnlyFunction(ERC20abi, process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, 'balanceOf', process.env.NEXT_PUBLIC_PRESALE_CONTRACT_ADDRESS)
+  setpresaleBalance(ethers.formatUnits(balance, 18))
+}
+
+fetchBalance()
+console.log({presaleBalance})
+  },[])
 
   return (
     <div>
@@ -29,9 +47,9 @@ const PreSale = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
                 <h3 className="text-2xl font-semibold text-yellow-400">
-                  100M+
+                  {presaleBalance}
                 </h3>
-                <p className="text-gray-200">Total Supply</p>
+                <p className="text-gray-200">Presale Balance</p>
               </div>
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
                 <h3 className="text-2xl font-semibold text-yellow-400">0.50</h3>

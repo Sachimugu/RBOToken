@@ -28,7 +28,7 @@ const TabContent = ({ title, amount, setAmount, address, setAddress, handleSubmi
             RBO
           </label>
           <input
-            type="number"
+            // type="text"
             id="address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
@@ -53,13 +53,16 @@ const TabContainer = () => {
   const [activeTab, setActiveTab] = useState('presale');
   const [amount, setAmount] = useState('');
   const [address, setAddress] = useState('');
+  const [presaleaddress, setPresaleAddress] = useState(process.env.NEXT_PUBLIC_PRESALE_CONTRACT_ADDRESS);
+
   const {callTransactionFunction}= useWalletStore()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const tx = await callTransactionFunction(ERC20abi, process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, 'mint', address, amount)
     console.log('amount:', amount);
     console.log('address:', address);
+    const tx = await callTransactionFunction(ERC20abi, process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, 'mint', address, amount)
+    console.log('tx:', tx);
   };
 
   return (
@@ -92,7 +95,7 @@ const TabContainer = () => {
           title="Fund Presale"
           amount={amount}
           setAmount={setAmount}
-          address={address}
+          address={presaleaddress}
           setAddress={setAddress}
           handleSubmit={handleSubmit}
         />
@@ -103,7 +106,7 @@ const TabContainer = () => {
           amount={amount}
           setAmount={setAmount}
           address={address}
-          setAddress={setAddress}
+          setAddress={setPresaleAddress}
           handleSubmit={handleSubmit}
         />
       )}
