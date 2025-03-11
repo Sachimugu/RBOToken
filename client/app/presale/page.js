@@ -10,13 +10,10 @@ import { useState } from "react";
 const PreSale = () => {
 
 
-  const {sendEtherToContract} =useWalletStore()
   const [amountInEther, setAmountInEther] = useState('');
   const [amountInRBO, setAmountInRBO] = useState('')
 
-  const buyToken  = async () => {
-    await sendEtherToContract(process.env.NEXT_PUBLIC_CONTRACT_ABI, "buyTokens", 1)
-  }
+ 
   return (
     <div>
       <section className="lg:flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 py-24 min-h-screen relative overflow-hidden">
@@ -49,7 +46,7 @@ const PreSale = () => {
               </div>
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
                 <h3 className="text-2xl font-semibold text-yellow-400">
-                  $0.01
+                  $0.001
                 </h3>
                 <p className="text-gray-200">Presale Price</p>
               </div>
