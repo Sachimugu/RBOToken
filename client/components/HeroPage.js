@@ -14,7 +14,7 @@ const HeroPage = () => {
   }
 
   const handleConnect = () => {
-    connectWallet(ERC20abi)
+    connectWallet(ERC20abi, process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS)
   }
 
 

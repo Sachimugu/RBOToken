@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import Web3Modal from 'web3modal';
 import { ethers } from 'ethers';
+import { handleError } from '@/lib/handleCustomErr';
 
 // Provider options for Web3Modal
 export const options = {
@@ -49,18 +50,18 @@ export const useWalletStore = create((set, get) => {
     contract: null,
     storeErr:null,
     walletAddress: walletAddress || null,
-    // _CONTRACT_ABI: CONTRACT_ABI['abi'],
+    // _CONTRACT_ABI: CONTRACT_ABI,
     CONTRACT_ADDRESS: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || contractAddress || "",
 
-    setStoreErr: (newErr) => set({ storeErr: newErr }),
+    set: (newErr) => set({ storeErr: newErr }),
     setContract: (newContract) => set({ contract: newContract }),
     setProvider: (newProvider) => set({ provider: newProvider }),
     setWalletAddress: (newAddress) => set({ walletAddress: newAddress }),
 
-    connectWallet: async (CONTRACT_ABI) => {
-    setStoreErr({storeErr:null});
+    connectWallet: async (CONTRACT_ABI, NEXT_PUBLIC_CONTRACT_ADDRESS) => {
+    set({storeErr:null});
 
-      // console.log('abi...',CONTRACT_ABI['abi'] );
+      // console.log('abi...',CONTRACT_ABI );
       const { walletAddress, contract } = get();
     
       // If wallet is already connected, no need to reconnect
@@ -70,7 +71,7 @@ export const useWalletStore = create((set, get) => {
       }
     
       try {
-        if (!process.env.NEXT_PUBLIC_CONTRACT_ADDRESS) {
+        if (!NEXT_PUBLIC_CONTRACT_ADDRESS) {
           throw new Error('Contract address is not defined.');
         }
     
@@ -91,7 +92,7 @@ export const useWalletStore = create((set, get) => {
     
         // Create contract instance with signer
         const newContract = new ethers.Contract(
-          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
+          NEXT_PUBLIC_CONTRACT_ADDRESS,
           CONTRACT_ABI, // Ensure you have the correct ABI
           signer
         );
@@ -114,7 +115,7 @@ export const useWalletStore = create((set, get) => {
     
       } catch (error) {
         console.error('Error connecting wallet:', error);
-    setStoreErr({storeErr:error});
+    set({storeErr:error});
 
 
       }
@@ -122,8 +123,8 @@ export const useWalletStore = create((set, get) => {
     
 
     // Function for calling a state-changing contract method (requires signer)
-    callTransactionFunction: async (methodName, ...params) => {
-    setStoreErr({storeErr:null});
+    callTransactionFunction: async (CONTRACT_ABI, NEXT_PUBLIC_CONTRACT_ADDRESS, methodName, ...params) => {
+    set({storeErr:null});
 
       const { contract, walletAddress } = get();
 
@@ -153,8 +154,8 @@ export const useWalletStore = create((set, get) => {
     
         // Create contract instance with signer
         const newContract = new ethers.Contract(
-          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-          CONTRACT_ABI['abi'], // Ensure you have the correct ABI
+          NEXT_PUBLIC_CONTRACT_ADDRESS,
+          CONTRACT_ABI, // Ensure you have the correct ABI
           signer
         );// Attempt to connect wallet and set contract
         set({ contract: newContract });
@@ -176,14 +177,14 @@ export const useWalletStore = create((set, get) => {
       } catch (error) {
         const errorMessage = handleError(error);
         console.error('Error calling transaction function:', errorMessage);
-        setStoreErr({storeErr:errorMessage});
+        set({storeErr:errorMessage});
 
         return {success:false, msg:errorMessage}; // Return the error message
       }
     },
 
-     sendEtherToContract :async (methodName, amountInEther, ...params) => {
-    setStoreErr({storeErr:null});
+     sendEtherToContract :async (CONTRACT_ABI, methodName, amountInEther, ...params) => {
+    set({storeErr:null});
 
       const { contract, walletAddress } = get();
     
@@ -214,7 +215,7 @@ export const useWalletStore = create((set, get) => {
         // Create contract instance with signer
         const newContract = new ethers.Contract(
           process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-          CONTRACT_ABI['abi'], // Ensure you have the correct ABI
+          CONTRACT_ABI, // Ensure you have the correct ABI
           signer
         );
         set({ contract: newContract });
@@ -244,7 +245,7 @@ export const useWalletStore = create((set, get) => {
       } catch (error) {
         const errorMessage = handleError(error);
         console.error('Error calling contract method with Ether:', errorMessage);
-    setStoreErr({storeErr:errorMessage});
+    set({storeErr:errorMessage});
 
         return { success: false, msg: errorMessage }; // Return the error message
       }
@@ -252,8 +253,8 @@ export const useWalletStore = create((set, get) => {
     
 
 
-    callReadOnlyFunction: async (methodName, ...params) => {
-    setStoreErr({storeErr:null});
+    callReadOnlyFunction: async (CONTRACT_ABI, methodName, ...params) => {
+    set({storeErr:null});
 
       const { contract, provider, walletAddress } = get();
     
@@ -278,7 +279,7 @@ export const useWalletStore = create((set, get) => {
         // Create contract instance with signer
         const newContract = new ethers.Contract(
           process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-          CONTRACT_ABI['abi'], // Ensure you have the correct ABI
+          CONTRACT_ABI, // Ensure you have the correct ABI
           signer
         );// Attempt to connect wallet and set contract
         set({ contract: newContract });
@@ -291,7 +292,7 @@ export const useWalletStore = create((set, get) => {
       // Check if the updatedContract is still null after connectWallet
       if (!updatedContract) {
         console.error('Contract still not available after connecting wallet.');
-    setStoreErr({storeErr:'Contract still not available after connecting wallet.'});
+    set({storeErr:'Contract still not available after connecting wallet.'});
 
         return;
       }
@@ -299,7 +300,7 @@ export const useWalletStore = create((set, get) => {
       // Check if the method is available on the updatedContract
       if (typeof updatedContract[methodName] !== 'function') {
         console.error(`Method ${methodName} is not available on the updatedContract.`);
-    setStoreErr({storeErr:`Method ${methodName} is not available on the updatedContract.`});
+    set({storeErr:`Method ${methodName} is not available on the updatedContract.`});
         
         return;
       }
@@ -310,7 +311,7 @@ export const useWalletStore = create((set, get) => {
         return result;
       } catch (error) {
         console.error('Error calling read-only function:', error);
-    setStoreErr({storeErr:error});
+    set({storeErr:error});
 
       }
     },
@@ -318,8 +319,8 @@ export const useWalletStore = create((set, get) => {
 
     // const { ethers } = require('ethers');
 
-callReadOnlyFunctionWithPrivateKey : async (methodName, ...params) => {
-    setStoreErr({storeErr:null});
+callReadOnlyFunctionWithPrivateKey : async (CONTRACT_ABI, methodName, ...params) => {
+    set({storeErr:null});
  
 
   try {
@@ -337,7 +338,7 @@ callReadOnlyFunctionWithPrivateKey : async (methodName, ...params) => {
 
     const newContract = new ethers.Contract(
       process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-      CONTRACT_ABI['abi'],
+      CONTRACT_ABI,
       wallet
     )
     const result = await newContract[methodName](...params);
@@ -345,12 +346,12 @@ callReadOnlyFunctionWithPrivateKey : async (methodName, ...params) => {
     return result;
   } catch (error) {
     console.error('Error calling read-only function:', error);
-    setStoreErr({storeErr:error});
+    set({storeErr:error});
   }
 },
     // Disconnect wallet
     disconnectWallet: () => {
-        setStoreErr({storeErr:null});
+        set({storeErr:null});
 
       localStorage.removeItem('walletAddress');
       localStorage.removeItem('contractAddress');

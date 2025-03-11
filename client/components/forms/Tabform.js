@@ -1,20 +1,22 @@
 'use client';
+import ERC20abi from '@/lib/abi/Ecr20ABI';
+import { useWalletStore } from '@/store/walletStore';
 import React, { useState } from 'react';
 
-const TabContent = ({ title, email, setEmail, password, setPassword, handleSubmit }) => (
+const TabContent = ({ title, amount, setAmount, address, setAddress, handleSubmit }) => (
   <div className="flex bg-white/10 items-center justify-center w-full">
     <div className="w-full p-8 space-y-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold text-gray-100">{title}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-yellow-500">
+          <label htmlFor="amount" className="block text-sm font-medium text-yellow-500">
             ETH
           </label>
           <input
             type="number"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            id="amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
             className="w-full px-4 py-2 mt-2 text-sm border bg-gray-200"
             placeholder="00.00 ETH"
             required
@@ -22,14 +24,14 @@ const TabContent = ({ title, email, setEmail, password, setPassword, handleSubmi
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-yellow-500">
+          <label htmlFor="address" className="block text-sm font-medium text-yellow-500">
             RBO
           </label>
           <input
             type="number"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            id="address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
             className="w-full px-4 py-2 mt-2 text-sm border bg-gray-200"
             placeholder="00.00 RBO"
             required
@@ -49,13 +51,15 @@ const TabContent = ({ title, email, setEmail, password, setPassword, handleSubmi
 
 const TabContainer = () => {
   const [activeTab, setActiveTab] = useState('presale');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [amount, setAmount] = useState('');
+  const [address, setAddress] = useState('');
+  const {callTransactionFunction}= useWalletStore()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Email:', email);
-    console.log('Password:', password);
+    const tx = await callTransactionFunction(ERC20abi, process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, 'mint', address, amount)
+    console.log('amount:', amount);
+    console.log('address:', address);
   };
 
   return (
@@ -86,30 +90,30 @@ const TabContainer = () => {
       {activeTab === 'presale' && (
         <TabContent
           title="Fund Presale"
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
+          amount={amount}
+          setAmount={setAmount}
+          address={address}
+          setAddress={setAddress}
           handleSubmit={handleSubmit}
         />
       )}
       {activeTab === 'airdrop' && (
         <TabContent
           title="Fund Airdrop"
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
+          amount={amount}
+          setAmount={setAmount}
+          address={address}
+          setAddress={setAddress}
           handleSubmit={handleSubmit}
         />
       )}
       {activeTab === 'stake' && (
         <TabContent
           title="Fund Stake"
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
+          amount={amount}
+          setAmount={setAmount}
+          address={address}
+          setAddress={setAddress}
           handleSubmit={handleSubmit}
         />
       )}

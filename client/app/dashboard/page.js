@@ -12,7 +12,7 @@ const PreSale = () => {
       <section className="lg:flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 py-24 min-h-screen relative overflow-hidden">
         {/* Heading */}
         <div className="text-center text-white px-4 md:px-8">
-          <div className="max-w-5xl mx-auto text-center space-y-6 relative z-10">
+          <div className="max-w-5xl mx-auto text-center space-y-6 relative z-0">
             {/* Heading */}
             <h2 className="text-5xl font-bold text-white">RBO - Be an early bird</h2>
             {/* <GlowingH1 /> */}

@@ -13,12 +13,12 @@ contract RBOToken is ERC20Capped, Ownable {
 
     constructor() ERC20("RBOToken", "RBO") ERC20Capped(100000000 * (10 ** decimals())) Ownable(msg.sender){
         burnRate = 1000;
-        _mint(owner(), 70000000 * (10 ** decimals()));
+        _mint(owner(), 20000000 * (10 ** decimals()));
     }
 
       function mint(address to, uint256 amount) external onlyOwner {
         require(totalSupply() + amount <=  cap(), "Exceeds max supply");
-        _mint(to, amount);
+        _mint(to,   amount * (10 ** decimals()));
     }
 
 
