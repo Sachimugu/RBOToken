@@ -1,9 +1,10 @@
 'use client';
 import ERC20abi from '@/lib/abi/Ecr20ABI';
 import { useWalletStore } from '@/store/walletStore';
-import React, { useState } from 'react';
+import { Loader } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
-const TabContent = ({ title, amount, setAmount, address, setAddress, handleSubmit }) => (
+const TabContent = ({ title, amount, setAmount, address, setAddress, handleSubmit, isLoading }) => (
   <div className="flex bg-white/10 items-center justify-center w-full">
     <div className="w-full p-8 space-y-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold text-gray-100">{title}</h2>
@@ -28,7 +29,6 @@ const TabContent = ({ title, amount, setAmount, address, setAddress, handleSubmi
             RBO
           </label>
           <input
-            // type="text"
             id="address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
@@ -42,7 +42,11 @@ const TabContent = ({ title, amount, setAmount, address, setAddress, handleSubmi
           type="submit"
           className="w-full font-bold py-2 mt-4 text-white bg-yellow-500"
         >
-          Buy
+          {isLoading ? (
+            <Loader className="text-white dark:text-white animate-spin mx-auto" size={34} />
+          ) : (
+            'Mint'
+          )}
         </button>
       </form>
     </div>
@@ -53,16 +57,51 @@ const TabContainer = () => {
   const [activeTab, setActiveTab] = useState('presale');
   const [amount, setAmount] = useState('');
   const [address, setAddress] = useState('');
-  const [presaleaddress, setPresaleAddress] = useState(process.env.NEXT_PUBLIC_PRESALE_CONTRACT_ADDRESS);
+  const [isLoading, setIsLoading] = useState(false); // Track loading state
+  const { callTransactionFunction } = useWalletStore();
 
-  const {callTransactionFunction}= useWalletStore()
+  // Define contract addresses
+  const presaleAddress = process.env.NEXT_PUBLIC_PRESALE_CONTRACT_ADDRESS;
+  const airdropAddress = process.env.NEXT_PUBLIC_AIRDROP_CONTRACT_ADDRESS;
+  const stakeAddress = process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS;
+
+  // Update address based on the active tab
+  useEffect(() => {
+    if (activeTab === 'presale') {
+      setAddress(presaleAddress);
+    } else if (activeTab === 'airdrop') {
+      setAddress(airdropAddress);
+    } else if (activeTab === 'stake') {
+      setAddress(stakeAddress);
+    }
+  }, [activeTab, presaleAddress, airdropAddress, stakeAddress]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setIsLoading(true); // Set loading to true when submitting the transaction
+
     console.log('amount:', amount);
     console.log('address:', address);
-    const tx = await callTransactionFunction(ERC20abi, process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, 'mint', address, amount)
-    console.log('tx:', tx);
+
+    try {
+      const tx = await callTransactionFunction(
+        ERC20abi,
+        process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS,
+        'mint',
+        address,
+        amount
+      );
+      console.log('tx:', tx);
+      setIsLoading(false); // Reset loading state after transaction completes
+
+    } catch (error) {
+      console.error('Error in transaction:', error);
+      setIsLoading(false); // Reset loading state after transaction completes
+
+    } finally {
+      setIsLoading(false); // Reset loading state after transaction completes
+    }
   };
 
   return (
@@ -95,9 +134,10 @@ const TabContainer = () => {
           title="Fund Presale"
           amount={amount}
           setAmount={setAmount}
-          address={presaleaddress}
+          address={address}
           setAddress={setAddress}
           handleSubmit={handleSubmit}
+          isLoading={isLoading} // Pass the loading state to TabContent
         />
       )}
       {activeTab === 'airdrop' && (
@@ -106,8 +146,9 @@ const TabContainer = () => {
           amount={amount}
           setAmount={setAmount}
           address={address}
-          setAddress={setPresaleAddress}
+          setAddress={setAddress}
           handleSubmit={handleSubmit}
+          isLoading={isLoading}
         />
       )}
       {activeTab === 'stake' && (
@@ -118,6 +159,7 @@ const TabContainer = () => {
           address={address}
           setAddress={setAddress}
           handleSubmit={handleSubmit}
+          isLoading={isLoading}
         />
       )}
     </div>

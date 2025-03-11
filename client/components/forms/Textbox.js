@@ -1,15 +1,23 @@
 'use client'
 import React, { useState } from 'react';
 
-const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const LoginForm = ({amountInEther, setAmountInEther, amountInRBO, setAmountInRBO}) => {
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Email:', email);
-    console.log('Password:', password);
+    console.log('Email:', amountInEther);
+    console.log('Password:', amountInRBO);
   };
+
+  const handleOnchangeInEther = (e) => {  
+    setAmountInEther(e.target.value)
+    setAmountInRBO(e.target.value *10000)
+    }
+  const handleOnchangeInRBO = (e) => { 
+    setAmountInEther(e.target.value/10000)
+    setAmountInRBO(e.target.value)
+  }
 
   return (
     <div className="flex bg-white/10 items-center justify-center w-full">
@@ -17,14 +25,14 @@ const LoginForm = () => {
         <h2 className="text-2xl font-semibold r text-gray-300">In Progress</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-yellow-500">
+            <label htmlFor="amountInEther" className="block text-sm font-medium text-yellow-500">
               ETH
             </label>
             <input
               type="number"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="amountInEther"
+              value={amountInEther}
+              onChange={handleOnchangeInEther}
               className="w-full px-4 py-2 mt-2 text-sm border bg-gray-200 "
               placeholder="00.00 ETH"
               required
@@ -32,14 +40,14 @@ const LoginForm = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-yellow-500">
+            <label htmlFor="amountInRBO" className="block text-sm font-medium text-yellow-500">
               RBO
             </label>
             <input
               type="Number"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="amountInRBO"
+              value={amountInRBO}
+              onChange={handleOnchangeInRBO}
               className="w-full px-4 py-2 mt-2 text-sm border bg-gray-200"
               placeholder="00.00 RBO"
               required

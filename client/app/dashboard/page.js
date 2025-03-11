@@ -3,6 +3,7 @@ import TabContainer from "@/components/forms/Tabform";
 import LoginForm from "@/components/forms/Textbox";
 import PresaleStepsTimeline from "@/components/PresaleTimeline";
 import ERC20abi from "@/lib/abi/Ecr20ABI";
+import { formatNumber } from "@/lib/utils";
 import { useWalletStore } from "@/store/walletStore";
 import { ethers } from "ethers";
 import Link from "next/link";
@@ -10,7 +11,7 @@ import { useEffect, useState } from "react";
 // import { useRouter } from "next/navigation";
 // import GlowingH1 from "./Glowtext";
 
-const PreSale = () => {
+const Dashboard = () => {
   const {callReadOnlyFunction} = useWalletStore()
   const [presaleBalance, setpresaleBalance] = useState(0)
 
@@ -47,17 +48,17 @@ console.log({presaleBalance})
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
                 <h3 className="text-2xl font-semibold text-yellow-400">
-                  {presaleBalance}
+                  {formatNumber(Math.round(presaleBalance))}
                 </h3>
-                <p className="text-gray-200">Presale Balance</p>
+                <p className="text-gray-200">Presale RBO</p>
               </div>
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
-                <h3 className="text-2xl font-semibold text-yellow-400">0.50</h3>
+                <h3 className="text-2xl font-semibold text-yellow-400">$0.50</h3>
                 <p className="text-gray-200">Listing price</p>
               </div>
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
                 <h3 className="text-2xl font-semibold text-yellow-400">
-                  $0.01
+                  $0.0001
                 </h3>
                 <p className="text-gray-200">Presale Price</p>
               </div>
@@ -75,7 +76,7 @@ console.log({presaleBalance})
               </div>
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
                 <h3 className="text-2xl font-semibold text-yellow-400">
-                  $5
+                  $0.001
                 </h3>
                 <p className="text-gray-200">Minimum buy</p>
               </div>
@@ -101,4 +102,4 @@ console.log({presaleBalance})
   );
 };
 
-export default PreSale;
+export default Dashboard;

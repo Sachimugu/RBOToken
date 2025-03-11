@@ -1,11 +1,22 @@
+'use client'
 import LoginForm from "@/components/forms/Textbox";
 import PresaleStepsTimeline from "@/components/PresaleTimeline";
+import { useWalletStore } from "@/store/walletStore";
 import Link from "next/link";
+import { useState } from "react";
 // import { useRouter } from "next/navigation";
 // import GlowingH1 from "./Glowtext";
 
 const PreSale = () => {
 
+
+  const {sendEtherToContract} =useWalletStore()
+  const [amountInEther, setAmountInEther] = useState('');
+  const [amountInRBO, setAmountInRBO] = useState('')
+
+  const buyToken  = async () => {
+    await sendEtherToContract(process.env.NEXT_PUBLIC_CONTRACT_ABI, "buyTokens", 1)
+  }
   return (
     <div>
       <section className="lg:flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 py-24 min-h-screen relative overflow-hidden">
@@ -75,7 +86,7 @@ const PreSale = () => {
         </div>
 
         <div className="lg:w-1/4">
-        <LoginForm/>
+        <LoginForm amountInEther={amountInEther} setAmountInEther={setAmountInEther} amountInRBO={amountInRBO} setAmountInRBO={setAmountInRBO}/>
         </div>
       </section>
     </div>
