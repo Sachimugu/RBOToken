@@ -1,13 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useWalletStore } from "@/store/walletStore";
 import ERC20abi from "@/lib/abi/Ecr20ABI";
-import { usersAirdropData } from "@/lib/db";
 
 const AirDrop = () => {
   const { walletAddress, connectWallet } = useWalletStore();
-  // Track task completion state
   const [taskCompletion, setTaskCompletion] = useState({
     twitter: false,
     facebook: false,
@@ -15,89 +12,47 @@ const AirDrop = () => {
     telegram: false,
     youtube: false,
   });
-  const [userData, setUserData] = useState(null);
 
-  const updateAirdropData = (newUser) => {
-    const index = usersAirdropData.findIndex(
-      (user) => user.walletAddress === newUser.walletAddress
-    );
-  
-    if (index !== -1) {
-      // If the walletAddress exists, update the tasks
-      usersAirdropData[index].tasks = newUser.tasks;
-    } else {
-      // If the walletAddress does not exist, add the new user
-      usersAirdropData.push(newUser);
+  // Fetch task status for the connected wallet address
+  useEffect(() => {
+    if (walletAddress) {
+      fetch(`/api/airdrop?walletAddress=${walletAddress}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.tasks) {
+            setTaskCompletion(data.tasks);
+          }
+        })
+        .catch((error) => console.error("Error fetching tasks:", error));
     }
-  };
+  }, [walletAddress]);
 
-  // Function to open the link in a new tab and mark the task as done
-  const handleTaskClick = (task, url) => {
+  // Function to handle task completion
+  const handleTaskClick = async (task, url) => {
+    if(!walletAddress){
+      handleConnect()
+    }
+
     if (!taskCompletion[task]) {
-      // Open link in a new tab
+      // Open the link in a new tab
       window.open(url, "_blank");
 
       // Mark the task as completed
-      setTaskCompletion((prevState) => ({
-        ...prevState,
-        [task]: true,
-      }));
-    }
+      const updatedTasks = { ...taskCompletion, [task]: true };
+      setTaskCompletion(updatedTasks);
 
-    setUserData((prevState) => ({
-      ...prevState,
-      tasks: {
-        ...prevState.tasks,
-        [task]: true,
-      },
-    }));
-    updateAirdropData(userData)
-    console.log({usersAirdropData})
-    
+      // Send the updated task status to the backend
+      await fetch('/api/airdrop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress, tasks: updatedTasks }),
+      });
+    }
   };
 
   const handleConnect = () => {
     connectWallet(ERC20abi, process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS);
   };
-
-  const findUserByWallet = (walletAddress) => {
-    return usersAirdropData.find(
-      (user) => user.walletAddress === walletAddress
-    );
-  };
-
-  // Handle wallet address submission
-  useEffect(() => {
-    console.log({ userData });
-  }, [userData]);
-
-  useEffect(() => {
-    const handleWalletSubmit = () => {
-      if (walletAddress) {
-        const user = findUserByWallet(walletAddress);
-        if (user) {
-          // If user exists, load their data
-          setUserData(user);
-        } else {
-          // If no user, create a new user object
-          const newUser = {
-            walletAddress,
-            tasks: {
-              twitter: false,
-              facebook: false,
-              instagram: false,
-              telegram: false,
-              youtube: false,
-            },
-          };
-          console.log(newUser);
-          setUserData(newUser); // Set the new user data
-          // usersAirdropData.push(newUser); // Add to the in-memory array
-        }
-      }
-    };
-    handleWalletSubmit();
-  }, []);
   return (
     <div>
       <section className="lg:flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 py-24 min-h-screen relative overflow-hidden">

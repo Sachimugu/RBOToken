@@ -1,23 +1,31 @@
 'use client'
 import { useState } from 'react';
 import Link from "next/link";
+import { useWalletStore } from '@/store/walletStore';
+import StakeAbi from '@/lib/abi/StakeAbi';
 
 const Staking = () => {
   const [stakeAmount, setStakeAmount] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('30');  // Default staking plan
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [error, setError] = useState(false);
+  const {callTransactionFunction} = useWalletStore()
+  
 
   // Handle staking form submission
-  const handleStake = () => {
+  const handleStake = async() => {
     if (!isWalletConnected) {
-      alert("Please connect your wallet first.");
+      setError("Please connect your wallet first.");
       return;
     }
     if (!stakeAmount || stakeAmount <= 0) {
-      alert("Please enter a valid stake amount.");
+      setError("Please enter a valid stake amount.");
       return;
     }
-    alert(`You have successfully staked ${stakeAmount} tokens for ${selectedPlan} days.`);
+  
+    const tx = await callTransactionFunction(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'stake', stakeAmount, selectedPlan)
+    console.log({tx});
+
   };
 
   return (
@@ -48,8 +56,8 @@ const Staking = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
               {/* 30 Days Plan */}
               <div
-                onClick={() => setSelectedPlan('30')}
-                className={`bg-white/10 p-6 rounded-lg backdrop-blur-md cursor-pointer hover:bg-indigo-700 transition-colors duration-300 ${selectedPlan === '30' ? 'border-2 border-yellow-400' : ''}`}
+                onClick={() => setSelectedPlan('OneMonth')}
+                className={`bg-white/10 p-6 rounded-lg backdrop-blur-md cursor-pointer hover:bg-indigo-700 transition-colors duration-300 ${selectedPlan === 'OneMonth' ? 'border-2 border-yellow-400' : ''}`}
               >
                 <h3 className="text-2xl font-semibold text-yellow-400">30 Days</h3>
                 <p className="text-gray-200">Earn 10% Rewards</p>
@@ -57,8 +65,8 @@ const Staking = () => {
 
               {/* 90 Days Plan */}
               <div
-                onClick={() => setSelectedPlan('90')}
-                className={`bg-white/10 p-6 rounded-lg backdrop-blur-md cursor-pointer hover:bg-indigo-700 transition-colors duration-300 ${selectedPlan === '90' ? 'border-2 border-yellow-400' : ''}`}
+                onClick={() => setSelectedPlan('ThreeMonths')}
+                className={`bg-white/10 p-6 rounded-lg backdrop-blur-md cursor-pointer hover:bg-indigo-700 transition-colors duration-300 ${selectedPlan === 'ThreeMonths' ? 'border-2 border-yellow-400' : ''}`}
               >
                 <h3 className="text-2xl font-semibold text-yellow-400">90 Days</h3>
                 <p className="text-gray-200">Earn 20% Rewards</p>
@@ -66,8 +74,8 @@ const Staking = () => {
 
               {/* 180 Days Plan */}
               <div
-                onClick={() => setSelectedPlan('180')}
-                className={`bg-white/10 p-6 rounded-lg backdrop-blur-md cursor-pointer hover:bg-indigo-700 transition-colors duration-300 ${selectedPlan === '180' ? 'border-2 border-yellow-400' : ''}`}
+                onClick={() => setSelectedPlan('SixMonths')}
+                className={`bg-white/10 p-6 rounded-lg backdrop-blur-md cursor-pointer hover:bg-indigo-700 transition-colors duration-300 ${selectedPlan === 'SixMonths' ? 'border-2 border-yellow-400' : ''}`}
               >
                 <h3 className="text-2xl font-semibold text-yellow-400">180 Days</h3>
                 <p className="text-gray-200">Earn 35% Rewards</p>

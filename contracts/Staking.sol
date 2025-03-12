@@ -14,12 +14,12 @@ contract StakingContract is Ownable {
     mapping(address => uint256) public rewards; // Tracks rewards for each user
     mapping(address => StakingPeriod) public stakingPeriods; // Tracks the selected staking period for each user
 
-    uint256 constant SECONDS_IN_A_YEAR = 365 days;
+    uint256 constant SECONDS_IN_3_MONTH = 90 days;
     uint256 constant SECONDS_IN_A_MONTH = 30 days;
     uint256 constant SECONDS_IN_6_MONTHS = 180 days;
 
     // Enum to represent the staking period
-    enum StakingPeriod { OneMonth, SixMonths, OneYear }
+    enum StakingPeriod { OneMonth, SixMonths, ThreeMonths }
 
     event Staked(address indexed user, uint256 amount, StakingPeriod period);
     event Unstaked(address indexed user, uint256 amount);
@@ -37,7 +37,7 @@ contract StakingContract is Ownable {
         require(amount > 0, "Amount must be greater than 0");
         
         // Validate the selected staking period
-        require(period == StakingPeriod.OneMonth || period == StakingPeriod.SixMonths || period == StakingPeriod.OneYear, "Invalid staking period");
+        require(period == StakingPeriod.OneMonth || period == StakingPeriod.SixMonths || period == StakingPeriod.ThreeMonths, "Invalid staking period");
         
         token.transferFrom(msg.sender, address(this), amount); // Transfer tokens from user to contract
         stakedAmount[msg.sender] += amount;
@@ -123,8 +123,7 @@ contract StakingContract is Ownable {
         } else if (period == StakingPeriod.SixMonths) {
             return SECONDS_IN_6_MONTHS;
         } else {
-            return SECONDS_IN_A_YEAR;
-        }
+            return SECONDS_IN_3_MONTH;    }
     }
 
     // Function to claim rewards manually

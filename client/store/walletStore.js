@@ -124,8 +124,8 @@ export const useWalletStore = create((set, get) => {
 
     // Function for calling a state-changing contract method (requires signer)
     callTransactionFunction: async (
-      CONTRACT_ABI,
       NEXT_PUBLIC_CONTRACT_ADDRESS,
+      CONTRACT_ABI,
       methodName,
       ...params
     ) => {
