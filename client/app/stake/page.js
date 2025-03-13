@@ -3,18 +3,18 @@ import { useState } from 'react';
 import Link from "next/link";
 import { useWalletStore } from '@/store/walletStore';
 import StakeAbi from '@/lib/abi/StakeAbi';
+import ERC20abi from '@/lib/abi/Ecr20ABI';
 
 const Staking = () => {
   const [stakeAmount, setStakeAmount] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('30');  // Default staking plan
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [error, setError] = useState(false);
-  const {callTransactionFunction} = useWalletStore()
+  const {callTransactionFunction, connectWallet, disconnectWallet, walletAddress} = useWalletStore()
   
 
   // Handle staking form submission
-  const handleStake = async() => {
-    if (!isWalletConnected) {
+  const handleStake = async () => {
+    if (!walletAddress) {
       setError("Please connect your wallet first.");
       return;
     }
@@ -23,10 +23,46 @@ const Staking = () => {
       return;
     }
   
-    const tx = await callTransactionFunction(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'stake', stakeAmount, selectedPlan)
-    console.log({tx});
-
+    // Map selectedPlan to the correct enum value for StakingPeriod
+    let period;
+    if (selectedPlan === "OneMonth") {
+      period = 0; // StakingPeriod.OneMonth
+    } else if (selectedPlan === "ThreeMonths") {
+      period = 1; // StakingPeriod.ThreeMonths
+    } else if (selectedPlan === "SixMonths") {
+      period = 2; // StakingPeriod.SixMonths
+    } else {
+      setError("Invalid staking period selected.");
+      return;
+    }
+  
+    // console.log(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'stake', parseInt(stakeAmount), period);
+    await handleApprove()
+    
+    const tx = await callTransactionFunction(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'stake', stakeAmount, period);
+    console.log({ tx });
   };
+  
+
+  const handleApprove = async()=>{
+    const tx = await callTransactionFunction(process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, ERC20abi, 'approve', process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, stakeAmount);
+    console.log({ tx });
+
+  }
+
+  const handleEarly = async()=>{
+    const tx = await callTransactionFunction(process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, ERC20abi, 'earlyUnstake');
+    console.log({ tx });
+
+  }
+
+  const handleConnect = () => {
+    connectWallet(StakeAbi, process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS)
+  }
+
+  const handleDisconnect = () => {
+    disconnectWallet()
+  }
 
   return (
     <div>
@@ -85,15 +121,21 @@ const Staking = () => {
             {/* Wallet Connect Button */}
             <div className="mt-8">
               <button
-                onClick={() => setIsWalletConnected(!isWalletConnected)}
+                onClick={walletAddress? handleDisconnect: handleConnect}
                 className="bg-yellow-400 text-black py-4 px-12 rounded-xl text-lg font-medium shadow-md hover:bg-yellow-500 transition-colors w-full"
               >
-                {isWalletConnected ? 'Wallet Connected' : 'Connect Wallet'}
+                {walletAddress ? walletAddress : 'Connect Wallet'}
               </button>
             </div>
 
             {/* Stake Button */}
-            <div className="mt-8">
+            <div className="mt-8 flex gap-8">
+            <button
+                onClick={handleEarly}
+                className="bg-yellow-400 text-black py-4 px-12 rounded-xl text-lg font-medium shadow-md hover:bg-yellow-500 transition-colors w-full"
+              >
+               Unstake Tokens
+              </button>
               <button
                 onClick={handleStake}
                 className="bg-yellow-400 text-black py-4 px-12 rounded-xl text-lg font-medium shadow-md hover:bg-yellow-500 transition-colors w-full"

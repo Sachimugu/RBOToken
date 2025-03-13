@@ -130,8 +130,9 @@ export const useWalletStore = create((set, get) => {
       ...params
     ) => {
       set({ storeErr: null });
+      console.log({params: params});
 
-      const { contract, walletAddress } = get();
+      const { walletAddress } = get();
 
       // Check if walletAddress is available
       if (!walletAddress) {
@@ -140,9 +141,7 @@ export const useWalletStore = create((set, get) => {
         await connectWallet(); // Automatically connect the wallet
       }
 
-      // Check if contract is available and connect if necessary
-      if (!contract) {
-        console.log("Contract not available. Connecting wallet...");
+   
         const modal = new Web3Modal({
           cacheProvider: true, // Persist user's wallet choice
           providerOptions: options, // Your wallet provider options
@@ -163,14 +162,13 @@ export const useWalletStore = create((set, get) => {
           CONTRACT_ABI, // Ensure you have the correct ABI
           signer
         ); // Attempt to connect wallet and set contract
-        set({ contract: newContract }); // Ensure contract is available
-      }
+        // set({ contract: newContract }); // Ensure contract is available
 
       // Now that the contract is available, proceed with calling the function
-      const { contract: updatedContract } = get();
+      // const { contract: updatedContract } = get();
 
       try {
-        const tx = await updatedContract[methodName](...params);
+        const tx = await newContract[methodName](...params);
         console.log(`Transaction sent: ${tx.hash}`);
 
         // Wait for the transaction to be mined

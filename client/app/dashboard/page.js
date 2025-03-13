@@ -15,6 +15,7 @@ const Dashboard = () => {
   const {callReadOnlyFunction} = useWalletStore()
   const [presaleBalance, setpresaleBalance] = useState(0)
   const [airdropBalance, setairdropBalance] = useState(0)
+  const [stakeBalance, setStakeBalance] = useState(0)
   const [participant, setParticipant] = useState(0)
   // console.log({participant})
 
@@ -30,6 +31,9 @@ const fetchBalance= async  ()=>{
   setpresaleBalance(ethers.formatUnits(prebalance, 18))
   const airbalance = await callReadOnlyFunction(ERC20abi, process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, 'balanceOf', process.env.NEXT_PUBLIC_AIRDROP_CONTRACT_ADDRESS)
   setairdropBalance(ethers.formatUnits(airbalance, 18))
+  const stakebalance = await callReadOnlyFunction(ERC20abi, process.env.NEXT_PUBLIC_ERC20__CONTRACT_ADDRESS, 'balanceOf', process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS)
+  setStakeBalance(ethers.formatUnits(stakebalance, 18))
+  console.log({prebalance, airbalance, stakebalance})
 
 }
 
@@ -72,7 +76,8 @@ console.log({presaleBalance})
               </div>
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
                 <h3 className="text-2xl font-semibold text-yellow-400">
-                  $airdropBalance
+                {formatNumber(Math.round(stakeBalance))}
+                  
                 </h3>
                 <p className="text-gray-200">Stake RBO</p>
               </div>

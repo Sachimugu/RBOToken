@@ -3,8 +3,10 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
-contract StakingContract is Ownable {
+contract StakingContract is Ownable, ReentrancyGuard {
     IERC20 public token; // The token to stake
     uint256 public rewardRate; // Annual reward rate in basis points (100 = 1%)
     uint256 public totalStaked; // Total tokens staked in the contract
@@ -14,7 +16,7 @@ contract StakingContract is Ownable {
     mapping(address => uint256) public rewards; // Tracks rewards for each user
     mapping(address => StakingPeriod) public stakingPeriods; // Tracks the selected staking period for each user
 
-    uint256 constant SECONDS_IN_3_MONTH = 90 days;
+    uint256 constant SECONDS_IN_3_MONTHS = 90 days;
     uint256 constant SECONDS_IN_A_MONTH = 30 days;
     uint256 constant SECONDS_IN_6_MONTHS = 180 days;
 
@@ -35,21 +37,20 @@ contract StakingContract is Ownable {
     // Function to stake tokens with a selected stake period
     function stake(uint256 amount, StakingPeriod period) external {
         require(amount > 0, "Amount must be greater than 0");
-        
-        // Validate the selected staking period
         require(period == StakingPeriod.OneMonth || period == StakingPeriod.SixMonths || period == StakingPeriod.ThreeMonths, "Invalid staking period");
-        
-        token.transferFrom(msg.sender, address(this), amount); // Transfer tokens from user to contract
+
+        uint256 adjustedAmount = amount;
+        token.transferFrom(msg.sender, address(this), adjustedAmount); // Transfer tokens from user to contract
         stakedAmount[msg.sender] += amount;
         stakeTime[msg.sender] = block.timestamp; // Record the time of staking
         stakingPeriods[msg.sender] = period; // Record the staking period
         totalStaked += amount;
-        
+
         emit Staked(msg.sender, amount, period);
     }
 
     // Function to automatically unstake when the staking period has elapsed
-    function autoUnstake() external {
+    function autoUnstake() external nonReentrant {
         require(stakedAmount[msg.sender] > 0, "No tokens to unstake");
 
         StakingPeriod selectedPeriod = stakingPeriods[msg.sender];
@@ -70,12 +71,13 @@ contract StakingContract is Ownable {
             // Transfer the staked tokens and rewards to the user
             token.transfer(msg.sender, unstakedAmount + rewardAmount); // Transfer tokens and reward
 
+            emit Unstaked(msg.sender, unstakedAmount);
             emit AutoUnstaked(msg.sender, unstakedAmount, rewardAmount); // Emit event for auto unstake
         }
     }
 
     // Function to manually unstake tokens before the staking period has ended
-    function earlyUnstake() external {
+    function earlyUnstake() external nonReentrant {
         require(stakedAmount[msg.sender] > 0, "No tokens to unstake");
         
         uint256 stakingDuration = block.timestamp - stakeTime[msg.sender];
@@ -123,11 +125,12 @@ contract StakingContract is Ownable {
         } else if (period == StakingPeriod.SixMonths) {
             return SECONDS_IN_6_MONTHS;
         } else {
-            return SECONDS_IN_3_MONTH;    }
+            return SECONDS_IN_3_MONTHS;
+        }
     }
 
     // Function to claim rewards manually
-    function claimReward() external {
+    function claimReward() external nonReentrant {
         uint256 reward = calculateReward(msg.sender);
         require(reward > 0, "No rewards available");
         rewards[msg.sender] += reward;
@@ -147,8 +150,7 @@ contract StakingContract is Ownable {
     }
 
     // Function to return the current reward of a specific user (accepts address as a parameter)
-function getCurrentReward(address user) external view returns (uint256) {
-    return calculateReward(user); // Return the calculated reward for the given address
-}
-
+    function getCurrentReward(address user) external view returns (uint256) {
+        return calculateReward(user); // Return the calculated reward for the given address
+    }
 }
