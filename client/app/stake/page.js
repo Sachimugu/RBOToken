@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from "next/link";
 import { useWalletStore } from '@/store/walletStore';
 import StakeAbi from '@/lib/abi/StakeAbi';
@@ -9,7 +9,7 @@ const Staking = () => {
   const [stakeAmount, setStakeAmount] = useState('');
   const [selectedPlan, setSelectedPlan] = useState('30');  // Default staking plan
   const [error, setError] = useState(false);
-  const {callTransactionFunction, connectWallet, disconnectWallet, walletAddress} = useWalletStore()
+  const {callTransactionFunction, callReadOnlyFunction, connectWallet, disconnectWallet, walletAddress} = useWalletStore()
   
 
   // Handle staking form submission
@@ -51,14 +51,23 @@ const Staking = () => {
   }
 
   const handleEarly = async()=>{
-    const tx = await callTransactionFunction(process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, ERC20abi, 'earlyUnstake');
+    const tx = await callTransactionFunction(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'earlyUnstake');
     console.log({ tx });
 
   }
 
-  const handleConnect = () => {
+  const handleConnect = async() => {
     connectWallet(StakeAbi, process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS)
+
   }
+
+  useEffect(()=>{
+    const loadwalletbalance = async()=>{
+  const prebalance = await callReadOnlyFunction(ERC20abi, process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, 'balanceOf', walletAddress)
+  console.log({prebalance})
+    }
+    loadwalletbalance()
+  },[])
 
   const handleDisconnect = () => {
     disconnectWallet()
