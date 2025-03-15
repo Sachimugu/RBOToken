@@ -63,6 +63,7 @@ const PreSale = () => {
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
                 <h3 className="text-2xl font-semibold text-yellow-400">
                   {/* 0{ethers.formatUnits(v.stakeAmount.msg, 18)} */}
+                  {0}
                 </h3>
                 <p className="text-gray-200">Stake Amount</p>
               </div>
@@ -75,7 +76,7 @@ const PreSale = () => {
                 <p className="text-gray-200">Stake Reward </p>
               </div>
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
-                <h3 className="text-2xl font-semibold text-yellow-400">{}</h3>
+                <h3 className="text-2xl font-semibold text-yellow-400">30 Days</h3>
                 <p className="text-gray-200">Period</p>
               </div>
               <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
