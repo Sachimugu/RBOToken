@@ -49,10 +49,10 @@ export const useWalletStore = create((set, get) => {
     provider: null,
     contract: null,
     storeErr: null,
-    walletAddress: walletAddress || null,
+    walletAddress: null,
     // _CONTRACT_ABI: CONTRACT_ABI,
     CONTRACT_ADDRESS:
-      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || contractAddress || "",
+      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "",
 
     set: (newErr) => set({ storeErr: newErr }),
     setContract: (newContract) => set({ contract: newContract }),
@@ -166,16 +166,22 @@ export const useWalletStore = create((set, get) => {
 
       // Now that the contract is available, proceed with calling the function
       // const { contract: updatedContract } = get();
+      localStorage.setItem("walletAddress", address);
+        localStorage.setItem(
+          "contractAddress",
+          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
+        );
 
       try {
         const tx = await newContract[methodName](...params);
         console.log(`Transaction sent: ${tx.hash}`);
 
         // Wait for the transaction to be mined
-        const receipt = await tx.wait();
-        console.log(`Transaction mined: ${receipt.transactionHash}`);
+        // const receipt = await tx.wait();
+        console.log(`Transaction mined: ${tx}`);
 
-        return { success: true, msg: receipt }; // Return the transaction receipt
+
+        return { success: true, msg: tx }; // Return the transaction receipt
       } catch (error) {
         const errorMessage = handleError(error);
         console.error("Error calling transaction function:", errorMessage);

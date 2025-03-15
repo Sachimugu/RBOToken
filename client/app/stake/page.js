@@ -1,169 +1,114 @@
 'use client'
-import { useEffect, useState } from 'react';
+import LoginForm from "@/components/forms/Textbox";
+import PresaleStepsTimeline from "@/components/PresaleTimeline";
+import { useWalletStore } from "@/store/walletStore";
 import Link from "next/link";
-import { useWalletStore } from '@/store/walletStore';
-import StakeAbi from '@/lib/abi/StakeAbi';
-import ERC20abi from '@/lib/abi/Ecr20ABI';
+import { useEffect, useState } from "react";
+import Staking from "./d";
+import StakeAbi from "@/lib/abi/StakeAbi";
+import { ethers } from "ethers";
+// import { useRouter } from "next/navigation";
+// import GlowingH1 from "./Glowtext";
 
-const Staking = () => {
-  const [stakeAmount, setStakeAmount] = useState('');
-  const [selectedPlan, setSelectedPlan] = useState('30');  // Default staking plan
-  const [error, setError] = useState(false);
+const PreSale = () => {
+
+
   const {callTransactionFunction, callReadOnlyFunction, connectWallet, disconnectWallet, walletAddress} = useWalletStore()
-  
-
-  // Handle staking form submission
-  const handleStake = async () => {
-    if (!walletAddress) {
-      setError("Please connect your wallet first.");
-      return;
-    }
-    if (!stakeAmount || stakeAmount <= 0) {
-      setError("Please enter a valid stake amount.");
-      return;
-    }
-  
-    // Map selectedPlan to the correct enum value for StakingPeriod
-    let period;
-    if (selectedPlan === "OneMonth") {
-      period = 0; // StakingPeriod.OneMonth
-    } else if (selectedPlan === "ThreeMonths") {
-      period = 1; // StakingPeriod.ThreeMonths
-    } else if (selectedPlan === "SixMonths") {
-      period = 2; // StakingPeriod.SixMonths
-    } else {
-      setError("Invalid staking period selected.");
-      return;
-    }
-  
-    // console.log(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'stake', parseInt(stakeAmount), period);
-    await handleApprove()
-    
-    const tx = await callTransactionFunction(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'stake', stakeAmount, period);
-    console.log({ tx });
-  };
-  
-
-  const handleApprove = async()=>{
-    const tx = await callTransactionFunction(process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, ERC20abi, 'approve', process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, stakeAmount);
-    console.log({ tx });
-
-  }
-
-  const handleEarly = async()=>{
-    const tx = await callTransactionFunction(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'earlyUnstake');
-    console.log({ tx });
-
-  }
-
-  const handleConnect = async() => {
-    connectWallet(StakeAbi, process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS)
-
-  }
+  const [currentReward, setcurrentReward] = useState()
+  const [sakeAmount, setstakeAmount] = useState()
+  const [period, setperiod] = useState()
 
   useEffect(()=>{
-    const loadwalletbalance = async()=>{
-  const prebalance = await callReadOnlyFunction(ERC20abi, process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS, 'balanceOf', walletAddress)
-  console.log({prebalance})
+    const fetch = async ()=>{
+      const currentReward = await callTransactionFunction(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'getCurrentReward', walletAddress);
+      const stakeAmount = await callTransactionFunction(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'stakedAmount', walletAddress);
+      const period = await callTransactionFunction(process.env.NEXT_PUBLIC_STAKE_CONTRACT_ADDRESS, StakeAbi, 'stakingPeriods', walletAddress);
+      console.log({currentReward, stakeAmount, period, walletAddress});
+      setcurrentReward(currentReward)
+      setstakeAmount(stakeAmount)
+      setperiod( period)
+      
     }
-    loadwalletbalance()
-  },[])
+    fetch()
+    console.log({sakeAmount})
+  },[walletAddress])
+  
 
-  const handleDisconnect = () => {
-    disconnectWallet()
-  }
-
+ 
   return (
-    <div>
-      <section className="lg:flex items-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 py-24 min-h-screen relative overflow-hidden">
+    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 ">
+      <section className="lg:flex  max-w-[90rem] mx-auto items-center justify-center py-24 min-h-screen relative overflow-hidden">
+        {/* Heading */}
         <div className="text-center text-white px-4 md:px-8">
           <div className="max-w-5xl mx-auto text-center space-y-6 relative z-10">
             {/* Heading */}
             <h2 className="text-5xl font-bold text-white">RBO - Stake Your Tokens</h2>
 
-            {/* Subheading */}
-            <p className="text-xl text-gray-200">
-              Secure your future by staking your tokens in our platform. Choose your staking plan and earn rewards based on your commitment!
-            </p>
-
-            {/* Staking Amount Input */}
-            <div className="mt-8">
-              <input
-                type="number"
-                value={stakeAmount}
-                onChange={(e) => setStakeAmount(e.target.value)}
-                placeholder="Enter amount to stake"
-                className="bg-white/10 p-4 rounded-lg backdrop-blur-md text-white border border-gray-500 w-full text-lg"
-              />
-            </div>
-
-            {/* Staking Plans */}
+{/* Subheading */}
+<p className="text-xl text-gray-200">
+  Secure your future by staking your tokens in our platform. Choose your staking plan and earn rewards based on your commitment!
+</p>
+            {/* Token Details */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              {/* 30 Days Plan */}
-              <div
-                onClick={() => setSelectedPlan('OneMonth')}
-                className={`bg-white/10 p-6 rounded-lg backdrop-blur-md cursor-pointer hover:bg-indigo-700 transition-colors duration-300 ${selectedPlan === 'OneMonth' ? 'border-2 border-yellow-400' : ''}`}
-              >
-                <h3 className="text-2xl font-semibold text-yellow-400">30 Days</h3>
-                <p className="text-gray-200">Earn 10% Rewards</p>
+              <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
+                <h3 className="text-2xl font-semibold text-yellow-400">
+                  100M+
+                </h3>
+                <p className="text-gray-200">Total Stake</p>
               </div>
-
-              {/* 90 Days Plan */}
-              <div
-                onClick={() => setSelectedPlan('ThreeMonths')}
-                className={`bg-white/10 p-6 rounded-lg backdrop-blur-md cursor-pointer hover:bg-indigo-700 transition-colors duration-300 ${selectedPlan === 'ThreeMonths' ? 'border-2 border-yellow-400' : ''}`}
-              >
-                <h3 className="text-2xl font-semibold text-yellow-400">90 Days</h3>
-                <p className="text-gray-200">Earn 20% Rewards</p>
+              <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
+                <h3 className="text-2xl font-semibold text-yellow-400">20%</h3>
+                <p className="text-gray-200">Reward%</p>
               </div>
-
-              {/* 180 Days Plan */}
-              <div
-                onClick={() => setSelectedPlan('SixMonths')}
-                className={`bg-white/10 p-6 rounded-lg backdrop-blur-md cursor-pointer hover:bg-indigo-700 transition-colors duration-300 ${selectedPlan === 'SixMonths' ? 'border-2 border-yellow-400' : ''}`}
-              >
-                <h3 className="text-2xl font-semibold text-yellow-400">180 Days</h3>
-                <p className="text-gray-200">Earn 35% Rewards</p>
+              <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
+                <h3 className="text-2xl font-semibold text-yellow-400">
+                  {/* 0{ethers.formatUnits(v.stakeAmount.msg, 18)} */}
+                </h3>
+                <p className="text-gray-200">Stake Amount</p>
               </div>
             </div>
-
-            {/* Wallet Connect Button */}
-            <div className="mt-8">
-              <button
-                onClick={walletAddress? handleDisconnect: handleConnect}
-                className="bg-yellow-400 text-black py-4 px-12 rounded-xl text-lg font-medium shadow-md hover:bg-yellow-500 transition-colors w-full"
-              >
-                {walletAddress ? walletAddress : 'Connect Wallet'}
-              </button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
+                <h3 className="text-2xl font-semibold text-yellow-400">
+                 0{}
+                </h3>
+                <p className="text-gray-200">Stake Reward </p>
+              </div>
+              <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
+                <h3 className="text-2xl font-semibold text-yellow-400">{}</h3>
+                <p className="text-gray-200">Period</p>
+              </div>
+              <div className="bg-white/10 p-6 rounded-lg backdrop-blur-md">
+                <h3 className="text-2xl font-semibold text-yellow-400">
+                  1000
+                </h3>
+                <p className="text-gray-200">Minimum</p>
+              </div>
             </div>
-
-            {/* Stake Button */}
-            <div className="mt-8 flex gap-8">
-            <button
-                onClick={handleEarly}
-                className="bg-yellow-400 text-black py-4 px-12 rounded-xl text-lg font-medium shadow-md hover:bg-yellow-500 transition-colors w-full"
-              >
-               Unstake Tokens
-              </button>
-              <button
-                onClick={handleStake}
-                className="bg-yellow-400 text-black py-4 px-12 rounded-xl text-lg font-medium shadow-md hover:bg-yellow-500 transition-colors w-full"
-              >
-                Stake Tokens
-              </button>
-            </div>
-
-            {/* Information */}
             <div className="mt-8">
               <p className="text-xl text-gray-200">
                 By staking, you are locking your tokens into our platform and earning rewards based on your selected plan duration. Make sure to check your rewards after the staking period ends.
               </p>
             </div>
+            {/* Call-to-Action Button */}
+            {/* <div className="space-x-4 ">
+              <button  className="bg-yellow-400 text-black py-3 px-8 rounded-xl text-lg font-medium shadow-md hover:bg-yellow-500 transition-colors mt-8">
+                Airdrop
+              </button>
+              <button className="hidden md:inline border-[2px] border-yellow-400 text-white font-bold py-2 px-8 rounded-xl text-lg shadow-md hover:bg-yellow-500 transition-colors mt-8">
+                Connect Wallet
+              </button>
+            </div> */}
           </div>
+        </div>
+
+        <div className="lg:w-2/4">
+        {/* <LoginForm amountInEther={amountInEther} setAmountInEther={setAmountInEther} amountInRBO={amountInRBO} setAmountInRBO={setAmountInRBO}/> */}
+        <Staking/>
         </div>
       </section>
     </div>
   );
 };
 
-export default Staking;
+export default PreSale;

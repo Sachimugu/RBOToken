@@ -12,7 +12,7 @@ contract RBOToken is ERC20Capped, Ownable {
     uint256 private constant BURN_RATE_DIVISOR = 10000;
 
     constructor() ERC20("RBOToken", "RBO") ERC20Capped(100000000 * (10 ** decimals())) Ownable(msg.sender){
-        burnRate = 1000;
+        burnRate = 0;
         _mint(owner(), 20000000 * (10 ** decimals()));
     }
 

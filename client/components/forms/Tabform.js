@@ -86,8 +86,8 @@ const TabContainer = () => {
 
     try {
       const tx = await callTransactionFunction(
-        ERC20abi,
         process.env.NEXT_PUBLIC_ERC20_CONTRACT_ADDRESS,
+        ERC20abi,
         'mint',
         address,
         amount
