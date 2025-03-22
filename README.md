@@ -2,6 +2,14 @@
 
 Welcome to the Airdrop, Presale, and Staking ecosystem, built using Solidity smart contracts and a modern Next.js frontend. This project brings together token distribution via airdrops, presale functionality, and staking with rewards. All features are designed to be intuitive, efficient, and optimized for user experience.
 
+![Image 1](./assets/d1.png)
+
+|  | Image 2 |
+|---------|---------|
+| ![Image 1](./assets/dd3.png) | ![Image 2](./assets/dd4.png) |
+
+
+
 ## Table of Contents
 - [Overview](#overview)
 - [Features](#features)
@@ -69,6 +77,11 @@ The contracts are implemented using Solidity and utilize various standards from 
 
 ## Frontend
 The frontend is built using Next.js, which ensures a smooth, modern user experience.
+
+<video  controls>
+  <source src="./assets/1.webm" type="video/webm">
+  Your browser does not support the video tag.
+</video>
 
 ### Features:
 - **Airdrop Dashboard**: View current whitelisted addresses and airdrop status.

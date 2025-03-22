@@ -82,7 +82,7 @@ const PreSale = () => {
           </div>
         </div>
 
-        <div className="lg:w-1/4">
+        <div className="lg:w-2/5 mr-8">
         <LoginForm amountInEther={amountInEther} setAmountInEther={setAmountInEther} amountInRBO={amountInRBO} setAmountInRBO={setAmountInRBO}/>
         </div>
       </section>
