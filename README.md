@@ -113,3 +113,6 @@ Clone this repository and install the necessary dependencies:
 git clone <repository-url>
 cd <project-directory>
 npm install
+```
+
+![Image 1](./assets/dd5.png)
