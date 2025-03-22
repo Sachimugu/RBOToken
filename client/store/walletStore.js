@@ -34,22 +34,32 @@ export const options = {
     },
     package: {
       getProvider: () =>
-        new ethers.providers.JsonRpcProvider("http://localhost:8545"),
+        new ethers.JsonRpcProvider("http://localhost:8545"),
     },
   },
 };
 
 export const useWalletStore = create((set, get) => {
   // Try to load wallet address and contract from localStorage
-  const walletAddress = localStorage.getItem("walletAddress");
-  const contractAddress = localStorage.getItem("contractAddress");
+  const Walletandcontacts = () => {
+    let swalletAddress = null;
+    let scontractAddress = null;
+  
+    if (typeof window !== "undefined") {
+      swalletAddress = localStorage.getItem('walletAddress');
+      scontractAddress = localStorage.getItem('contractAddress');
+    }
+  
+    // Return the values as an object
+    return { swalletAddress, scontractAddress };
+  }
 
   // Initial state with persisted values (if any)
   return {
     provider: null,
-    contract: null,
     storeErr: null,
-    walletAddress: null,
+    contract: Walletandcontacts()[1]|| null,
+    walletAddress: Walletandcontacts()[0]|| null,
     // _CONTRACT_ABI: CONTRACT_ABI,
     CONTRACT_ADDRESS:
       process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "",
